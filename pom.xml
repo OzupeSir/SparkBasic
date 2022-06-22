@@ -6,11 +6,15 @@
 
     <groupId>com.ozupesir.SparkGrowth</groupId>
     <artifactId>SparkBasic</artifactId>
+    <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>spark-core</module>
+    </modules>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
-    
+
 </project>
