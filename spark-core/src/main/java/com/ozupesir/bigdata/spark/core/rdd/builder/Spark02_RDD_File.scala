@@ -1,4 +1,4 @@
-package com.ozupesir.bigdata.spark.core.rdd
+package com.ozupesir.bigdata.spark.core.rdd.builder
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
