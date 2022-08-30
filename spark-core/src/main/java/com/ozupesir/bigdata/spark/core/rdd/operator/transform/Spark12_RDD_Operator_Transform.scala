@@ -4,18 +4,18 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 
 
-object Spark07_RDD_Operator_Transform {
+object Spark12_RDD_Operator_Transform {
 
   def main(args: Array[String]): Unit = {
     val sparkConf = new SparkConf().setMaster("local[*]").setAppName("RDD")
     val sc = new SparkContext(sparkConf)
 
-    // TODO 算子 - filter
-    val rdd = sc.makeRDD(List(1, 2, 3, 4))
+    // TODO 算子 - sortBy
+    val rdd = sc.makeRDD(List(6,2,4,5,3,1), 2)
 
-    val filterRDD: RDD[Int] = rdd.filter(num => num % 2 != 0)
+    val newRDD: RDD[Int] = rdd.sortBy(num => num)
 
-    filterRDD.collect().foreach(println)
+    newRDD.saveAsTextFile("output")
 
     sc.stop()
 
