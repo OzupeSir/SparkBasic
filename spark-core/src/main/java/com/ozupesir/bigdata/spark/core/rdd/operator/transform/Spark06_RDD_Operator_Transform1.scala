@@ -15,6 +15,7 @@ object Spark06_RDD_Operator_Transform1 {
     // groupBy会将数据源中的每一个数据进行分组判断，根据返回的分组key进行分组
     // 相同的key值的数据会放置在一个组中
 
+    // 分组和分区没有必然的联系
     val groupRDD = rdd.groupBy(_.charAt(0))
 
     groupRDD.collect().foreach(println)
