@@ -12,7 +12,7 @@ object Spark07_RDD_Operator_Action {
 
     val user: User = new User()
     // Task not serializable
-    rdd.collect.foreach(
+    rdd.foreach(
       num => {
         println("age = " + (user.age + num))
       }
