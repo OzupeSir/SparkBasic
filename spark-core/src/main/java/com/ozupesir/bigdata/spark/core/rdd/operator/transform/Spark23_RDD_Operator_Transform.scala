@@ -7,10 +7,10 @@ import org.apache.spark.{SparkConf, SparkContext}
 object Spark23_RDD_Operator_Transform {
 
   def main(args: Array[String]): Unit = {
-    val sparkConf = new SparkConf().setMaster("local[*]").setAppName("RDD")
+    val sparkConf:SparkConf = new SparkConf().setMaster("local[*]").setAppName("RDD")
     val sc = new SparkContext(sparkConf)
 
-    // TODO 算子 - left out join
+    // TODO 算子 - cogroup
     val rdd1: RDD[(String, Int)] = sc.makeRDD(List(
       ("a", 1), ("b", 2), ("c", 3), ("a", 5)
     ))
