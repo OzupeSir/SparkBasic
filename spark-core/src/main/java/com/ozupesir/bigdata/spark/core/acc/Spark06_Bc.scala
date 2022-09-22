@@ -15,7 +15,8 @@ object Spark06_Bc {
     val rdd1 = sc.makeRDD(List(
       ("a", 1),
       ("b", 2),
-      ("c", 3)
+      ("c", 3),
+      ("c", 0)
     ))
 
     val map = mutable.Map(("a", 4), ("b", 5), ("c", 6))
