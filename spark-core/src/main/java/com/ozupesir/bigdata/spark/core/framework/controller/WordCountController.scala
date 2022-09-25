@@ -14,6 +14,5 @@ class WordCountController extends TController{
 		val array: Array[(String, Int)] = wordCountService.dataAnalysis()
 		
 		array.foreach(println)
-		//  println(array)
 	}
 }

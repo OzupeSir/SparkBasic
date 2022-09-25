@@ -5,7 +5,7 @@ import com.ozupesir.bigdata.spark.core.framework.controller.WordCountController
 
 object WordCountApplication extends App with TApplication {
 	// 启动应用程序
-	start{
+	start(){
 		val Controller = new WordCountController()
 		Controller.dispatch()
 	}
