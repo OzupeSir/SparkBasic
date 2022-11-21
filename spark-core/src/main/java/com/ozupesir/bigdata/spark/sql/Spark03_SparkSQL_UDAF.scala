@@ -16,24 +16,23 @@ object Spark03_SparkSQL_UDAF {
 
     spark.sql("select age,username from user").show
 
-    spark.udf.register("prefixName", (name: String) => {
-      "Name: " + name
-    })
-    spark.sql("select age,prefixName(username) from user").show
+    spark.udf.register("ageAvg", new MyAvgUDAF())
+    spark.sql("select ageAvg(age) from user").show
 
     // TODO 关闭环境
     spark.close()
   }
+
   /*
   自定义聚合函数类，计算年龄的平均值
   1. 继承UserDefinedAggregateFunction
-  2. 重写方法 ctrl+i
+  2. 重写方法 ctrl+i(8种方法)
    */
-  class MyAvgUDAF extends UserDefinedAggregateFunction{
+  class MyAvgUDAF extends UserDefinedAggregateFunction {
     //  输入数据的结构
     override def inputSchema: StructType = {
       StructType(
-        Array(StructField("age",LongType))
+        Array(StructField("age", LongType))
       )
     }
 
@@ -54,14 +53,30 @@ object Spark03_SparkSQL_UDAF {
     override def deterministic: Boolean = true
 
     // 缓冲区初始化
-    override def initialize(buffer: MutableAggregationBuffer): Unit ={
-      buffer(0)=0L
+    override def initialize(buffer: MutableAggregationBuffer): Unit = {
+      //      buffer(0)=0L
+      //      buffer(1)=0L
+
+      buffer.update(0, 0L)
+      buffer.update(1, 0L)
     }
 
-    override def update(buffer: MutableAggregationBuffer, input: Row): Unit = ???
+    // 根据输入的值更新缓冲区数据
+    override def update(buffer: MutableAggregationBuffer, input: Row): Unit = {
+      buffer.update(0, buffer.getLong(0) + input.getLong(0))
+      buffer.update(1, buffer.getLong(1) + 1)
+    }
 
-    override def merge(buffer1: MutableAggregationBuffer, buffer2: Row): Unit = ???
 
-    override def evaluate(buffer: Row): Any = ???
+    // 缓冲区数据合并
+    override def merge(buffer1: MutableAggregationBuffer, buffer2: Row): Unit = {
+      buffer1.update(0, buffer1.getLong(0) + buffer2.getLong(0))
+      buffer1.update(1, buffer1.getLong(1) + buffer2.getLong(1))
+    }
+
+    // 计算平均值
+    override def evaluate(buffer: Row): Any = {
+      buffer.getLong(0) / buffer.getLong(1)
+    }
   }
 }
