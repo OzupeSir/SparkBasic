@@ -2,6 +2,10 @@ package com.ozupesir.bigdata.spark.sql
 
 import org.apache.spark.SparkConf
 import org.apache.spark.sql._
+import org.apache.spark.sql.expressions.Aggregator
+
+import scala.collection.mutable
+import scala.util.parsing.json.JSON.flatten2
 
 object Spark05_SparkSQL_test2 {
 	def main(args: Array[String]): Unit = {
@@ -16,76 +20,76 @@ object Spark05_SparkSQL_test2 {
 		// 2. 启用Hive的支持
 		// 3. 增加对应的依赖关系（包含Mysql驱动）
 		
-//		spark.sql("use ozupesir").show()
+		//		spark.sql("use ozupesir").show()
 		
 		spark.sql("use ozupesir")
 		
-		spark.sql("drop table if exists user_visit_action")
-		spark.sql("drop table if exists product_info")
-		spark.sql("drop table if exists city_info")
+		spark.sql(
+			"""
+			  |select c.area,c.city_name,p.product_name,count(1) as click_count
+			  |from user_visit_action u
+			  |join product_info p on u.click_product_id=p.product_id
+			  |join city_info c on u.city_id=c.city_id
+			  |GROUP by c.area,p.product_name,c.city_name
+			  |""".stripMargin).createTempView("src_tbl")
+		
 		
 		spark.sql(
 			"""
-			  | CREATE TABLE `user_visit_action`(
-			  |  `date` string,
-			  |  `user_id` bigint,
-			  |  `session_id` string,
-			  |  `page_id` bigint,
-			  |  `action_time` string,
-			  |  `search_keyword` string,
-			  |  `click_category_id` bigint,
-			  |  `click_product_id` bigint,
-			  |  `order_category_ids` string,
-			  |  `order_product_ids` string,
-			  |  `pay_category_ids` string,
-			  |  `pay_product_ids` string,
-			  |  `city_id` bigint)
-			  | row format delimited fields terminated by '\t'
-			  |""".stripMargin)
+			  | select
+			  |	 area,product_name,sum(click_count) as click_count
+			  | from src_tbl
+			  | group by area,product_name
+			  |""".stripMargin).createTempView("area_count")
 		
 		spark.sql(
 			"""
-			  | load data local inpath 'sparkSqlDatas/user_visit_action.txt' into table user_visit_action
-			  |""".stripMargin)
+			  | select
+			  |	 area,
+			  |  product_name,
+			  |  click_count,
+			  |  rank() over(partition by area order by click_count desc) as rank
+			  | from area_count
+			  |""".stripMargin).createTempView("area_count_rank")
 		
 		spark.sql(
 			"""
-			  | CREATE TABLE `product_info`(
-			  |    `product_id` bigint,
-			  |    `product_name` string,
-			  |    `extend_info` string)
-			  |    row format delimited fields terminated by '\t'
-			  |""".stripMargin)
+			  | select
+			  |	 area,
+			  |  product_name,
+			  |  click_count,
+			  |  rank
+			  | from area_count_rank where rank<=3
+			  |""".stripMargin).show //.createTempView("area_count_rank_filter")
 		
-		spark.sql(
-			"""
-			  | load data local inpath 'sparkSqlDatas/product_info.txt' into table product_info
-			  |""".stripMargin)
-		
-		spark.sql(
-			"""
-			  | CREATE TABLE `city_info`(
-			  |  `city_id` bigint,
-			  |  `city_name` string,
-			  |  `area` string)
-			  |  row format delimited fields terminated by '\t'
-			  |""".stripMargin)
-		
-		spark.sql(
-			"""
-			  | load data local inpath 'sparkSqlDatas/city_info.txt' into table city_info
-			  |""".stripMargin)
-		
-//		spark.sql(
-//			"""
-//			  | select count(1) from user_visit_action
-//			  | union
-//			  | select count(1) from product_info
-//			  | union
-//			  | select count(1) from city_info
-//			  | """.stripMargin)
+		"""
+		  | select MyStrUDAF(click_count,city_name) from
+		  | group by are,product_name
+		  |""".stripMargin
 		
 		// TODO 关闭环境
 		spark.close()
+	}
+	
+	case class Info(var click_count: Long, var city_name: String)
+	
+	case class Buff(var cityMap: mutable.Map[String, Long])
+	
+	class MyStrUDAF() extends Aggregator[Info, Buff, String] {
+		override def zero: Buff = Buff(mutable.Map[String, Long]())
+		
+		override def reduce(b: Buff, a: Info): Buff = {
+			var click_count = b.cityMap.getOrElse(a.city_name, 0L) + a.click_count
+			var cityMap = b.cityMap.update(a.city_name, click_count)
+			Buff(cityMap)
+		}
+		
+		override def merge(b1: Buff, b2: Buff): Buff = ???
+		
+		override def finish(reduction: Buff): String = ???
+		
+		override def bufferEncoder: Encoder[Buff] = ???
+		
+		override def outputEncoder: Encoder[Long] = ???
 	}
 }
