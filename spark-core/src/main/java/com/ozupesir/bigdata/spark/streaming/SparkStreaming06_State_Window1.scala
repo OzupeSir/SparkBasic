@@ -4,14 +4,13 @@ import org.apache.spark.SparkConf
 import org.apache.spark.streaming.dstream.{DStream, ReceiverInputDStream}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 
-object SparkStreaming07_State_Window1 {
+object SparkStreaming06_State_Window1 {
   def main(args: Array[String]): Unit = {
 
-    val sparkStreaming: SparkConf = new SparkConf().setMaster("local[*]").setAppName("SparkStreaming")
+    val sparkConf: SparkConf = new SparkConf().setMaster("local[*]").setAppName("SparkStreaming")
     // TODO 创建环境对象
     // StreamingContext创建时，需要传递两个参数
     // 第一个参数表示环境配置
-    val sparkConf = sparkStreaming
     // 第二个参数表示批量处理的周期（采集周期）
     val ssc = new StreamingContext(sparkConf, Seconds(3))
     ssc.checkpoint("cp")
