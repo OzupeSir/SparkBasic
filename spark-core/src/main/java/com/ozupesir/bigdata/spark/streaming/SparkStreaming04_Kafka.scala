@@ -27,7 +27,6 @@ object SparkStreaming04_Kafka {
       "value.deserializer" -> "org.apache.kafka.common.serialization.StringDeserializer"
     )
 
-
     val kafkaDataDS: InputDStream[ConsumerRecord[String, String]] = KafkaUtils.createDirectStream[String, String](
       ssc,
       LocationStrategies.PreferConsistent,

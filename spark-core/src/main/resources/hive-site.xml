@@ -4,7 +4,7 @@
 
     <property>
         <name>javax.jdo.option.ConnectionURL</name>
-        <value>jdbc:mysql://localhost:3306/hive?createDatabaseIfNotExist=true</value>
+        <value>jdbc:mysql://master:3306/hive?createDatabaseIfNotExist=true</value>
         <description>JDBC connect string for a JDBC metastore</description>
     </property>
     <property>
@@ -14,7 +14,7 @@
     </property>
     <property>
         <name>javax.jdo.option.ConnectionUserName</name>
-        <value>root</value>
+        <value>hive</value>
         <description>username to use against metastore database</description>
     </property>
     <property>
@@ -24,11 +24,11 @@
     </property>
     <property>
         <name>hive.metastore.warehouse.dir</name>
-        <value>/user/hive/warehouse</value>
+        <value>hdfs://master:9000/user/hive/warehouse</value>
     </property>
     <property>
         <name>hive.metastore.uris</name>
-        <value>thrift://localhost:9083</value>
+        <value>thrift://master:9083</value>
     </property>
     <property>
         <name>hive.server2.thrift.port</name>

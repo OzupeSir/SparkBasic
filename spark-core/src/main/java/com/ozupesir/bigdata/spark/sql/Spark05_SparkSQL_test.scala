@@ -6,7 +6,7 @@ import org.apache.spark.sql._
 object Spark05_SparkSQL_test {
 	def main(args: Array[String]): Unit = {
 		// TODO 创建SparkSQL的运行环境
-		System.setProperty("HADDOOP_USER_NAME", "root")
+		System.setProperty("HADOOP_USER_NAME", "ozupesir")
 		
 		val sparkConf: SparkConf = new SparkConf().setMaster("local[*]").setAppName("SparkSQL")
 		val spark: SparkSession = SparkSession.builder().enableHiveSupport().config(sparkConf).getOrCreate()

@@ -15,7 +15,7 @@ object Spark04_SparkSQL_JDBC {
     // 读取Mysql数据
     val df: DataFrame = spark.read
       .format("jdbc")
-      .option("url", "jdbc:mysql://localhost:3306/spark-sql")
+      .option("url", "jdbc:mysql://master:3306/spark-sql")
       .option("user", "root")
       .option("password", "zjp04213118.")
       .option("dbtable", "user")
@@ -25,7 +25,7 @@ object Spark04_SparkSQL_JDBC {
 
     df.write
       .format("jdbc")
-      .option("url", "jdbc:mysql://localhost:3306/spark-sql")
+      .option("url", "jdbc:mysql://master:3306/spark-sql")
       .option("user", "root")
       .option("password", "zjp04213118.")
       .option("dbtable", "user1")
