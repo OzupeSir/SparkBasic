@@ -8,7 +8,7 @@ import org.apache.spark.streaming.dstream.{DStream, InputDStream}
 import org.apache.spark.streaming.kafka010.{ConsumerStrategies, KafkaUtils, LocationStrategies}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 
-import java.sql.{PreparedStatement, ResultSet}
+import java.sql.{Connection, PreparedStatement, ResultSet}
 import java.text.SimpleDateFormat
 import java.util.Date
 import scala.collection.mutable.ListBuffer
@@ -16,10 +16,10 @@ import scala.collection.mutable.ListBuffer
 object SparkStreaming11_Req1_BlackList1 {
   def main(args: Array[String]): Unit = {
 
+    val sparkConf: SparkConf = new SparkConf().setMaster("local[*]").setAppName("SparkStreaming")
     // TODO 创建环境对象
     // StreamingContext创建时，需要传递两个参数
     // 第一个参数表示环境配置
-    val sparkConf = new SparkConf().setMaster("local[*]").setAppName("SparkStreaming")
     // 第二个参数表示批量处理的周期（采集周期）
     val ssc = new StreamingContext(sparkConf, Seconds(3))
 
@@ -38,18 +38,18 @@ object SparkStreaming11_Req1_BlackList1 {
 
     val adClickData: DStream[AdClickData] = kafkaDataDS.map(
       kafkaData => {
-        val data = kafkaData.value()
-        val datas = data.split(" ")
+        val data: String = kafkaData.value()
+        val datas: Array[String] = data.split(" ")
         AdClickData(datas(0), datas(1), datas(2), datas(3), datas(4))
       }
     )
     // TODO 周期性获取黑名单数据
     val ds: DStream[((String, String, String), Int)] = adClickData.transform(
       rdd => {
+        val blackList: ListBuffer[String] = ListBuffer[String]()
         // TODO 通过JDBC周期性获取黑名单数据
-        val blackList = ListBuffer[String]()
-        val conn = JDBCUtil.getConnection
-        val pstat = conn.prepareStatement("select userid from black_list")
+        val conn: Connection = JDBCUtil.getConnection
+        val pstat: PreparedStatement = conn.prepareStatement("select userid from black_list")
 
         val rs: ResultSet = pstat.executeQuery()
         while (rs.next()) {
@@ -71,9 +71,9 @@ object SparkStreaming11_Req1_BlackList1 {
         filterRDD.map(
           data => {
             val sdf = new SimpleDateFormat("yyyy-MM-dd")
-            val day = sdf.format(new Date(data.ts.toLong))
-            val user = data.user
-            val ad = data.ad
+            val day: String = sdf.format(new Date(data.ts.toLong))
+            val user: String = data.user
+            val ad: String = data.ad
 
             ((day, user, ad), 1)
           }
@@ -101,12 +101,12 @@ object SparkStreaming11_Req1_BlackList1 {
 //        )
 
         rdd.foreach {
-          case ((day, user, ad), count) => {
-            println(s"${day} ${user} ${ad} ${count}")
+          case ((day, user, ad), count) =>
+            println(s"$day $user $ad $count")
             if (count >= 30) {
               // TODO 如果统计数量超过点击阈值，那么将用户拉入黑名单
-              val conn = JDBCUtil.getConnection
-              val sql =
+              val conn: Connection = JDBCUtil.getConnection
+              val sql: String =
                 """
                   | insert into black_list(userid)
                   | values (?)
@@ -116,20 +116,20 @@ object SparkStreaming11_Req1_BlackList1 {
               JDBCUtil.executeUpdate(conn, sql, Array(user, user))
               conn.close()
             } else {
+              val conn: Connection = JDBCUtil.getConnection
               // TODO 如果没有超过阈值，那么需要将当天的广告点击数量进行更新
-              val conn = JDBCUtil.getConnection
-              val sql =
+              val sql: String =
                 """
                   |select
                   | *
                   |from user_ad_count
                   |where dt=? and userid =? and adid=?
                   |""".stripMargin
-              val flg = JDBCUtil.ifExist(conn, sql, Array(day, user, ad))
+              val flg: Boolean = JDBCUtil.ifExist(conn, sql, Array(day, user, ad))
               // 查询统计表数据
               if (flg) {
                 // 如果存在数据，那么更新
-                val sql =
+                val sql: String =
                   """
                     | update user_ad_count
                     | set count = count + ?
@@ -138,16 +138,16 @@ object SparkStreaming11_Req1_BlackList1 {
                 JDBCUtil.executeUpdate(conn, sql, Array(count, day, user, ad))
 
                 // TODO 判断更新后的点击数量是否超过阈值，如果超过，那么将用户拉入黑名单
-                val sql2 =
+                val sql2: String =
                   """
                    select *
                    from user_ad_count
                    where dt=? and userid =? and adid=? and count>=30
                   """.stripMargin
-                val flg1 = JDBCUtil.ifExist(conn, sql2, Array(day, user, ad))
+                val flg1: Boolean = JDBCUtil.ifExist(conn, sql2, Array(day, user, ad))
 
                 if (flg1) {
-                  val sql =
+                  val sql: String =
                     """
                       | insert into black_list(userid)
                       | values (?)
@@ -158,7 +158,7 @@ object SparkStreaming11_Req1_BlackList1 {
                 }
               } else {
                 // 如果不存在数据，就新增
-                val sql =
+                val sql: String =
                   """
                     | insert into user_ad_count (dt,userid,adid,count)
                     | values(?,?,?,?)
@@ -167,7 +167,7 @@ object SparkStreaming11_Req1_BlackList1 {
               }
               conn.close()
             }
-          }
+
         }
       }
     )
