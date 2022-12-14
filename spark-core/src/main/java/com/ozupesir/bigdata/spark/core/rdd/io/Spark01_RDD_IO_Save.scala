@@ -1,7 +1,6 @@
 package com.ozupesir.bigdata.spark.core.rdd.io
 
-import org.apache.spark.rdd.RDD
-import org.apache.spark.{Partitioner, SparkConf, SparkContext}
+import org.apache.spark.{SparkConf, SparkContext}
 
 object Spark01_RDD_IO_Save {
   def main(args: Array[String]): Unit = {

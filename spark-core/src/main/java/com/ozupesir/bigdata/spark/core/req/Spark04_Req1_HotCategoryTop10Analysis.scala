@@ -1,11 +1,9 @@
 package com.ozupesir.bigdata.spark.core.req
 
-import org.apache.spark.rdd.RDD
 import org.apache.spark.util.AccumulatorV2
 import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.collection.mutable
-import scala.jdk.Accumulator
 
 object Spark04_Req1_HotCategoryTop10Analysis {
 	

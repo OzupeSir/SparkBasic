@@ -1,7 +1,6 @@
 package com.ozupesir.bigdata.spark.core.rdd.persist
 
 import org.apache.spark.rdd.RDD
-import org.apache.spark.storage.StorageLevel
 import org.apache.spark.{SparkConf, SparkContext}
 
 object Spark04_RDD_Persist {

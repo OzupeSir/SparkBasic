@@ -8,7 +8,6 @@ object Spark02_SparkSQL_UDF {
     // TODO 创建SparkSQL的运行环境
     val sparkConf: SparkConf = new SparkConf().setMaster("local[*]").setAppName("SparkSQL")
     val spark: SparkSession = SparkSession.builder().config(sparkConf).getOrCreate()
-    import spark.implicits._
 
     val df: DataFrame = spark.read.json("datas/user.json")
     df.createOrReplaceTempView("user")

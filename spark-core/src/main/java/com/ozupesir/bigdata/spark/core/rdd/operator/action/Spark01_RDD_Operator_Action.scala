@@ -1,7 +1,6 @@
 package com.ozupesir.bigdata.spark.core.rdd.operator.action
 
 import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.rdd.RDD
 
 object Spark01_RDD_Operator_Action {
 

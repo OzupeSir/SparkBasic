@@ -2,7 +2,7 @@ package com.ozupesir.bigdata.spark.sql
 
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.expressions.Aggregator
-import org.apache.spark.sql.{DataFrame, Encoder, Encoders, SparkSession, functions}
+import org.apache.spark.sql._
 
 object Spark03_SparkSQL_UDAF1 {
   def main(args: Array[String]): Unit = {

@@ -1,8 +1,8 @@
 package com.ozupesir.bigdata.spark.sql
 
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.expressions.Aggregator
 import org.apache.spark.sql._
+import org.apache.spark.sql.expressions.Aggregator
 
 object Spark03_SparkSQL_UDAF2 {
   def main(args: Array[String]): Unit = {

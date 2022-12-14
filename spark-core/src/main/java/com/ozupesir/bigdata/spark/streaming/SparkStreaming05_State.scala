@@ -1,9 +1,7 @@
 package com.ozupesir.bigdata.spark.streaming
 
-import org.apache.kafka.clients.consumer.{ConsumerConfig, ConsumerRecord}
 import org.apache.spark.SparkConf
-import org.apache.spark.streaming.dstream.{InputDStream, ReceiverInputDStream}
-import org.apache.spark.streaming.kafka010.{ConsumerStrategies, KafkaUtils, LocationStrategies}
+import org.apache.spark.streaming.dstream.ReceiverInputDStream
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 
 object SparkStreaming05_State {
